@@ -130,6 +130,16 @@ var StateFromStore = function(stateDescriptors) {
         });
     };
 
+    var getStoreState = function(component) {
+        var initialState = {};
+        Object.keys(stateDescriptors).forEach(function(stateKey) {
+            var stateData = fetchNewStateData(
+                component, stateKey, false).stateData;
+            initialState[stateKey] = stateData;
+        });
+        return initialState;;
+    };
+
     return {
         getInitialState: function() {
             this[storageKey] = {
@@ -140,13 +150,11 @@ var StateFromStore = function(stateDescriptors) {
                 changeListeners: {}
             };
 
-            var initialState = {};
-            Object.keys(stateDescriptors).forEach(function(stateKey) {
-                var stateData = fetchNewStateData(
-                    this, stateKey, false).stateData;
-                initialState[stateKey] = stateData;
-            }, this);
-            return initialState;
+            return getStoreState(this);
+        },
+
+        componentWillMount: function() {
+            this.setState(getStoreState(this));
         },
 
         componentDidMount: function() {
